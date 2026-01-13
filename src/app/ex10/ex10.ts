@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-// --- THUẬT TOÁN TÍNH ÂM LỊCH (Giữ nguyên class LunarCalendar của bạn) ---
+// --- THUẬT TOÁN TÍNH ÂM LỊCH (Giữ nguyên class LunarCalendar) ---
 class LunarCalendar {
   static jdFromDate(dd: number, mm: number, yy: number): number {
     const a = Math.floor((14 - mm) / 12);
@@ -14,7 +14,8 @@ class LunarCalendar {
     }
     return jd;
   }
-  // ... (Giữ nguyên các phương thức static khác: getNewMoonDay, getSunLongitude, v.v...)
+  
+  // ... (Giữ nguyên các hàm getNewMoonDay, getSunLongitude, getLunarMonth11, getLeapMonthOffset...)
   static getNewMoonDay(k: number, timeZone: number): number {
     const T = k / 1236.85;
     const T2 = T * T;
@@ -120,7 +121,6 @@ class LunarCalendar {
   }
 }
 
-// --- LOGIC COMPONENT ANGULAR ---
 @Component({
   selector: 'app-ex10',
   standalone: true,
@@ -164,29 +164,18 @@ export class Ex10 {
     const timeZone = 7;
     const [lunarDay, lunarMonth, lunarYear, lunarLeap] = LunarCalendar.convertSolar2Lunar(dd, mm, yy, timeZone);
 
-    // Mảng Can - Chi (Dùng chung cho Năm, Tháng, Ngày)
-    // Lưu ý: Can bắt đầu từ Canh (0) -> Kỷ (9)
-    // Chi bắt đầu từ Thân (0) -> Mùi (11)
+    // Mảng Can Chi
     const cans = ['Canh', 'Tân', 'Nhâm', 'Quý', 'Giáp', 'Ất', 'Bính', 'Đinh', 'Mậu', 'Kỷ'];
     const chis = ['Thân', 'Dậu', 'Tuất', 'Hợi', 'Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tỵ', 'Ngọ', 'Mùi'];
 
-    // --- A. TÍNH CAN CHI NĂM ---
+    // --- A. NĂM ---
     const yearCanIndex = lunarYear % 10;
     const yearChiIndex = lunarYear % 12;
     const namAmText = `Năm ${cans[yearCanIndex]} ${chis[yearChiIndex]}`;
 
-    // --- B. TÍNH CAN CHI THÁNG ---
-    // Công thức: Tìm Can của tháng 1 (tháng Dần) dựa vào Can Năm.
-    // Canh/Ất (0/5) -> Tháng 1 là Mậu Dần (8)
-    // Tân/Bính (1/6) -> Tháng 1 là Canh Dần (0)
-    // Nhâm/Đinh (2/7) -> Tháng 1 là Nhâm Dần (2)
-    // Quý/Mậu (3/8) -> Tháng 1 là Giáp Dần (4)
-    // Giáp/Kỷ (4/9) -> Tháng 1 là Bính Dần (6)
-    // Quy luật: Can tháng 1 = (CanNăm * 2 + 8) % 10
+    // --- B. THÁNG ---
     const monthCanStart = (yearCanIndex * 2 + 8) % 10;
     const monthCanIndex = (monthCanStart + lunarMonth - 1) % 10;
-    
-    // Chi tháng: Tháng 1 luôn là Dần. Dần ở vị trí index 6 trong mảng chis (Thân=0... Dần=6)
     const monthChiIndex = (lunarMonth + 5) % 12;
     
     let thangAmText = `${cans[monthCanIndex]} ${chis[monthChiIndex]}`;
@@ -194,16 +183,14 @@ export class Ex10 {
       thangAmText += ` (Nhuận)`;
     }
 
-    // --- C. TÍNH CAN CHI NGÀY ---
-    // Dùng Julian Day Number (jd)
+    // --- C. NGÀY (Đã hiệu chỉnh lại offset) ---
     const jd = LunarCalendar.jdFromDate(dd, mm, yy);
-    // Công thức tính Can Ngày với mảng bắt đầu bằng 'Canh': (jd + 8) % 10
-    const dayCanIndex = (jd + 8) % 10;
-    // Công thức tính Chi Ngày với mảng bắt đầu bằng 'Thân': (jd + 8) % 12
-    const dayChiIndex = (jd + 8) % 12;
+    // Lưu ý: Offset này để khớp với ngày Giáp Tý (01/01/2024)
+    // Mảng cans bắt đầu từ Canh(0), mảng chis bắt đầu từ Thân(0)
+    const dayCanIndex = (jd + 3) % 10; 
+    const dayChiIndex = (jd + 5) % 12;
     const ngayAmText = `${cans[dayCanIndex]} ${chis[dayChiIndex]}`;
 
-    // Format hiển thị số (để hiện dòng Âm lịch tổng hợp)
     const amLichFull = lunarLeap 
       ? `${lunarDay}/${lunarMonth} (nhuận)/${lunarYear}` 
       : `${lunarDay}/${lunarMonth}/${lunarYear}`;
@@ -212,11 +199,9 @@ export class Ex10 {
       thu: dayOfWeek,
       duongLich: `${dd}/${mm}/${yy}`,
       amLich: amLichFull,
-      
-      // Các trường hiển thị chi tiết (đã format Can Chi)
       namAm: namAmText,
-      thangAm: `Tháng ${thangAmText}`, // Ví dụ: Tháng Giáp Tý
-      ngayAm: `Ngày ${ngayAmText}`     // Ví dụ: Ngày Ất Sửu
+      thangAm: `Tháng ${thangAmText}`,
+      ngayAm: `Ngày ${ngayAmText}`
     };
   }
 }
