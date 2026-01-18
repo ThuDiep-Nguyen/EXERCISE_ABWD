@@ -1,0 +1,20 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common'; 
+import { CatalogService } from '../catalog-service';
+
+@Component({
+  selector: 'app-ex14',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './ex14.html',
+  styleUrl: './ex14.css',
+})
+export class Ex14 implements OnInit {
+  categories: any[] = [];
+
+  constructor(private catalogService: CatalogService) {}
+
+  ngOnInit(): void {
+    this.categories = this.catalogService.getCategories();
+  }
+}
