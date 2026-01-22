@@ -1,0 +1,23 @@
+<p>listproduct works!</p>
+<table>
+    <thead>
+        <th> ID </th>
+        <th> NAME </th>
+        <th> PRICE </th>
+        <th> IMAGE </th>
+    </thead>
+    <tbody>
+        <tr *ngFor="let p of products">
+            <td>{{p.id}}</td>
+            <td>{{p.name}}</td>
+            <td>{{p.price}}</td>
+            <td>
+                <img src="{{p.image}}" width="100" height="100" 
+                title="clik for view detail"
+                style="cursor: pointer;"
+                (click)="view_detail(p.id)"
+                />
+            </td>
+        </tr>
+    </tbody>
+</table>

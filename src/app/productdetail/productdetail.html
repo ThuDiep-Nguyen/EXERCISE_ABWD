@@ -1,0 +1,29 @@
+<div *ngIf="product_selected; else notFoundTemplate">
+    <p>Chi tiết sản phẩm:</p>
+    <table border="1">
+        <tr>
+            <td> Product ID</td>
+            <td> {{product_selected.id}}</td>
+        </tr>
+        <tr>
+            <td> Product Name  </td>
+            <td> {{product_selected.name}}</td>
+        </tr>
+        <tr>
+            <td> Product Price </td>
+            <td> {{product_selected.price}}</td>
+        </tr>
+        <tr>
+            <td> Image</td>
+            <td> 
+                <img [src]="product_selected.image" width="200" />
+            </td>
+        </tr>
+    </table>
+    <br>
+    <a href="/san-pham-1">Quay lại danh sách</a>
+</div>
+
+<ng-template #notFoundTemplate>
+    <h3>Đang tải hoặc không tìm thấy sản phẩm...</h3>
+</ng-template>
